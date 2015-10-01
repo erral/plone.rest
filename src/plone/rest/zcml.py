@@ -5,7 +5,7 @@ from zope.interface import Interface
 from zope.schema import TextLine, Bool
 from zope.publisher.interfaces.browser import IBrowserPublisher
 from plone.rest import interfaces
-from plone.rest.cors import get_cors_preflight_view
+from plone.rest.cors import wrap_cors, options_view
 
 from zope.component.zcml import adapter
 from zope.security.zcml import Permission
@@ -43,15 +43,6 @@ class IService(Interface):
                     u"this is optional",
         required=False)
 
-    cors_enabled = Bool(
-        title=u"The name of the view that should be the default."
-              u"[get|post|put|delete]",
-        description=u"""
-        This name refers to view that should be the view used by
-        default (if no view name is supplied explicitly).""",
-        required=False
-        )
-
     cors_origin = TextLine(
         title=u"The name of the view that should be the default." +
               u"[get|post|put|delete]",
@@ -74,7 +65,6 @@ def serviceDirective(
         factory,
         for_,
         layer=None,
-        cors_enabled=False,
         cors_origin=None,
         permission=CheckerPublic
         ):
@@ -106,20 +96,34 @@ def serviceDirective(
 
     # defineChecker(factory, Checker(required))
 
-    if cors_enabled:
+    if cors_origin:
         # Check if there is already an adapter for options
 
         # Register
+        # adapter(
+        #     _context,
+        #     factory=(get_cors_preflight_view),
+        #     provides=IBrowserPublisher,
+        #     for_=(for_, interfaces.IOPTIONS)
+        # )
+
         adapter(
             _context,
-            factory=(get_cors_preflight_view),
+            factory=(options_view(cors_origin),),
             provides=IBrowserPublisher,
             for_=(for_, interfaces.IOPTIONS)
         )
 
-    adapter(
-        _context,
-        factory=(factory,),
-        provides=IBrowserPublisher,
-        for_=(for_, marker)
-    )
+        adapter(
+            _context,
+            factory=(wrap_cors(factory, cors_origin),),
+            provides=IBrowserPublisher,
+            for_=(for_, marker)
+        )
+    else:
+        adapter(
+            _context,
+            factory=(factory,),
+            provides=IBrowserPublisher,
+            for_=(for_, marker)
+        )

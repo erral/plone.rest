@@ -29,5 +29,8 @@ def btph_api_request(context, event):
     """Mark a request with Accept 'application/json' with the IAPIRequest
        interface.
     """
+    if event.request.get('REQUEST_METHOD') == 'OPTIONS':
+        alsoProvides(event.request, IOPTIONS)
+
     if event.request.getHeader('Accept') == 'application/json':
         mark_as_api_request(event.request)
