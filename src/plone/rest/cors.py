@@ -21,15 +21,23 @@ def wrap_cors(fn, cors_origins):
 
         result = fn(context, request)
         request.response.setHeader('Access-Control-Allow-Origin', cors_origins)
-        request.response.setHeader('Access-Control-Allow-Methods', 'POST,GET,DELETE,PUT,OPTIONS')
-        # request.response.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization')
-        request.response.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization,x-firephp-version')
+        request.response.setHeader(
+            'Access-Control-Allow-Methods',
+            'POST,GET,DELETE,PUT,OPTIONS'
+        )
+        # request.response.setHeader(
+        #     'Access-Control-Allow-Headers',
+        #     'Origin, Content-Type, Accept, Authorization'
+        # )
+        request.response.setHeader(
+            'Access-Control-Allow-Headers',
+            'Origin, Content-Type, Accept, Authorization,x-firephp-version'
+        )
         request.response.setHeader('Access-Control-Allow-Credentials', 'true')
         request.response.setHeader('Access-Control-Max-Age', '1728000')
         return result
 
     return function_wrapped
-
 
 
 def options_view(cors_origins):
@@ -41,8 +49,14 @@ def options_view(cors_origins):
         #                        'Method not allowed')
 
         request.response.setHeader('Access-Control-Allow-Origin', cors_origins)
-        request.response.setHeader('Access-Control-Allow-Methods', 'POST,GET,DELETE,PUT,OPTIONS')
-        request.response.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Accept, Authorization,x-firephp-version')
+        request.response.setHeader(
+            'Access-Control-Allow-Methods',
+            'POST,GET,DELETE,PUT,OPTIONS'
+        )
+        request.response.setHeader(
+            'Access-Control-Allow-Headers',
+            'Origin, Content-Type, Accept, Authorization,x-firephp-version'
+        )
         request.response.setHeader('Access-Control-Allow-Credentials', 'true')
         request.response.setHeader('Access-Control-Max-Age', '1728000')
 
